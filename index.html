@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<style>
+			.filler{
+				font-size: 80px;
+				height: 350px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #FFF;
+			}
+		</style>
+		<script>
+			function debounce(func, delay) {
+				var timer = null;
+				return function(){
+					var context = this;
+					var args = arguments;
+
+					clearTimeout(timer);
+					timer = setTimeout(function(){
+						func.apply(context, args)
+					}, delay);
+				}
+			}
+
+			function lowEnough(){
+				var pageHeight = Math.max(document.body.scrollHeight,document.body.offsetHeight);
+				var viewportHeight = window.innerHeight || document.documentElement.clientHeight ||	document.body.clientHeight || 0;		
+				var scrollHeight = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;		
+				var isEnough = (pageHeight - viewportHeight - scrollHeight < 350);
+
+				if(isEnough) document.body.appendChild(newElements())
+			}
+
+			var newElements = function(){
+				var _color = Date.now();
+				var color = _color.toString();
+				var bgColor = "#" + color.substr(color.length-3, 3);
+				var newDiv = document.createElement("div");
+				var textNode = document.createTextNode(bgColor); 
+
+				newDiv.classList.add("filler");
+				newDiv.style.backgroundColor =  bgColor;
+				newDiv.appendChild(textNode);
+
+				return newDiv;
+			}
+
+			window.onscroll = debounce(lowEnough, 200);
+		</script>
+	</head>
+
+	<body>
+		<div class="filler"></div>
+		<div class="filler"></div>
+		<div class="filler"></div>
+	</body>
+</html>
