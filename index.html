@@ -9,6 +9,11 @@
 				justify-content: center;
 				color: #FFF;
 			}
+			.content{
+				height: 150px;
+				font-size: 36px;
+				color: #000;				
+			}
 		</style>
 		<script>
 			function debounce(func, delay) {
@@ -24,13 +29,13 @@
 				}
 			}
 
-			function lowEnough(){
+			function touchDown(){
 				var pageHeight = Math.max(document.body.scrollHeight,document.body.offsetHeight);
 				var viewportHeight = window.innerHeight || document.documentElement.clientHeight ||	document.body.clientHeight || 0;		
 				var scrollHeight = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;		
-				var isEnough = (pageHeight - viewportHeight - scrollHeight < 350);
+				var isDown = (pageHeight - viewportHeight - scrollHeight < 350);
 
-				if(isEnough) document.body.appendChild(newElements())
+				if(isDown) document.body.appendChild(newElements())
 			}
 
 			var newElements = function(){
@@ -47,12 +52,50 @@
 				return newDiv;
 			}
 
+
+			function makeRequest(url, callBackSuccess, callBackError){
+				var xmlHttp = new XMLHttpRequest();
+
+				xmlHttp.onreadystatechange = function(){
+					if(xmlHttp.readyState == 4){
+						if(xmlHttp.status == 200){
+							var data = JSON.parse(xmlHttp.response)
+							callBackSuccess(data);
+						}
+						else{
+							callBackError();
+						}
+			 		}
+				}
+
+				xmlHttp.open('GET', url, true);
+				xmlHttp.setRequestHeader("Content-Type", "application/vnd.github.v3+json")
+				xmlHttp.send(null);
+			}
+
+			function showTitle(data){
+				var title = document.createTextNode(data[4].name);
+				var url = document.createTextNode(data[4].url);
+				var description = document.createTextNode(data[4].description);
+
+				document.getElementById("titleContainer").appendChild(title);
+				document.getElementById("urlContainer").appendChild(url);
+				document.getElementById("descContainer").appendChild(description);
+			}
+
+			makeRequest(
+				"https://api.github.com/users/jerry5chang/repos",
+				showTitle
+			)
+
 			window.onscroll = debounce(lowEnough, 200);
 		</script>
 	</head>
 
 	<body>
-		<div class="filler"></div>
+		<div id="titleContainer" class="filler content"></div>
+		<div id="urlContainer" class="filler content"></div>
+		<div id="descContainer" class="filler content"></div>
 		<div class="filler"></div>
 		<div class="filler"></div>
 	</body>
